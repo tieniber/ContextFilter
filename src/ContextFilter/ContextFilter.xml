@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<widget id="ContextFilter.widget.ContextFilter" needsEntityContext="true" xmlns="http://www.mendix.com/widget/1.0/">
+    <name>ContextFilter</name>
+    <description>The description of this widget.</description>
+
+    <icon />
+
+    <properties>
+    <!--  gridName: null,        overrideStaticConstraint: null,        filterAttr: null, -->
+     <property key="gridName" type="string" required="true" defaultValue="">
+         <caption>Grid Name</caption>
+         <category>General</category>
+         <description>The name of the grid to attach to. Must be a sibling of this widget.</description>
+     </property>
+     <property key="overrideStaticConstraint" type="boolean" required="true" defaultValue="false">
+         <caption>Override Static?</caption>
+         <category>General</category>
+         <description>If Yes, will override any xpath filters set for the grid in the modeler. If no, behaves like search</description>
+     </property>
+     <property key="filterAttr" type="attribute" required="true" isPath="no">
+         <caption>Filter Attr</caption>
+         <category>General</category>
+         <description>The Attribute on the context object that contains the xpath filter</description>
+         <attributeTypes>
+             <attributeType name="String" />
+         </attributeTypes>
+     </property>
+    </properties>
+</widget>
