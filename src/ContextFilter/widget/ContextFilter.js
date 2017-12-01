@@ -68,7 +68,7 @@ define([
         },
 
         _filterAndReloadGrid: function(filterString) {
-            var datasource = this._grid._dataSource,
+            var datasource = this._grid._dataSource || this._grid._datasource, // grid || listview
                 backup = null;
             if (this.overrideStaticConstraint) {
                 backup = datasource._staticconstraint;
@@ -79,7 +79,13 @@ define([
             }
             datasource.isValid(lang.hitch(this, function(ok) {
                 if (ok) { // this is always true
-                    this._grid.reload();
+                    if (this._grid.reload && "function" === typeof this._grid.reload) { // grid
+                        this._grid.reload();
+                    } else if (this._grid.update && "function" === typeof this._grid.update) {
+                        this._grid.update();
+                    } else {
+                        console.error("Could not find the reload/update method.");
+                    }
                 }
             }));
 
