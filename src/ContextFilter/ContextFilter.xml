@@ -34,11 +34,5 @@
               <attributeType name="String" />
           </attributeTypes>
       </property>
-      <property key="microflow" type="microflow" required="false">
-          <caption>Selection Action</caption>
-          <category>Selection</category>
-          <description>The microflow to run when you click the Selection Action button</description>
-          <returnType type="Void"></returnType>
-      </property>
     </properties>
 </widget>

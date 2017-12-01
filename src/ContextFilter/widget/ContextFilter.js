@@ -14,8 +14,9 @@ define([
     "dojo/text",
     "dojo/html",
     "dojo/_base/event",
+    "dojo/aspect"
 
-], function(declare, _WidgetBase, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, lang, dojoText, dojoHtml, dojoEvent) {
+], function(declare, _WidgetBase, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, lang, dojoText, dojoHtml, dojoEvent, Aspect) {
     "use strict";
 
     return declare("ContextFilter.widget.ContextFilter", [_WidgetBase], {
@@ -24,7 +25,7 @@ define([
         overrideStaticConstraint: null,
         filterAttr: null,
         filterOutAttr: null,
-        microflow: null,
+        // microflow: null,
 
         // Internal variables.
         _handles: null,
@@ -48,40 +49,61 @@ define([
             logger.debug(this.id + ".update");
             this._contextObj = obj;
             var filterString = this._contextObj.get(this.filterAttr);
-            this._addActionButton();
+            // this._addActionButton();
+            this._attachGridSelectionListeners();
             this._filterAndReloadGrid(filterString);
             this._resetSubscriptions();
             this._updateRendering(callback);
         },
 
         /**
+         * every time the selection is updated, update the context object
+         */
+        _attachGridSelectionListeners: function() {
+            Aspect.after(this._grid, "_addToSelection", lang.hitch(this, function() {
+                this._setCurrentSelectionToContext();
+            }));
+            Aspect.after(this._grid, "_removeFromSelection", lang.hitch(this, function() {
+                this._setCurrentSelectionToContext();
+            }));
+        },
+
+        /**
          * Add a new button to the datagrid that, when clicked, 
          * updates a value on the context entity and then calls a microflow
          */
-        _addActionButton: function() {
-            if (!this.filterOutAttr) return;
-            var button = document.createElement("button");
-            button.id = this.id + "_btn";
-            button.innerText = "Do Something";
-            button.className = "btn mx-button btn-default";
-            this._grid.toolBarNode.append(button);
-            this.connect(button, "click", lang.hitch(this, function() {
-                var gridSelection = this._grid._getXpathSelection();
+        // _addActionButton: function() {
+        //     if (!this.filterOutAttr) return;
+        //     var button = document.createElement("button");
+        //     button.id = this.id + "_btn";
+        //     button.innerText = "Do Something";
+        //     button.className = "btn mx-button btn-default";
+        //     this._grid.toolBarNode.append(button);
+        //     this.connect(button, "click", lang.hitch(this, function() {
+        //         this._setCurrentSelectionToContext();
+        //         if (this.microflow) {
+        //             mx.data.action({
+        //                 params: {
+        //                     applyto: "selection",
+        //                     actionname: this.microflow,
+        //                     guids: [this._contextObj.getGuid()]
+        //                 },
+        //                 origin: this.mxform,
+        //                 callback: lang.hitch(this, function() {
+        //                     console.debug("sent");
+        //                 })
+        //             });
+        //         }
+        //     }));
+        // },
+
+        _setCurrentSelectionToContext: function() {
+            var gridSelection = this._grid._getXpathSelection();
+            if (gridSelection) {
                 this._contextObj.set(this.filterOutAttr, gridSelection.xpath + gridSelection.constraints);
-                if (this.microflow) {
-                    mx.data.action({
-                        params: {
-                            applyto: "selection",
-                            actionname: this.microflow,
-                            guids: [this._contextObj.getGuid()]
-                        },
-                        origin: this.mxform,
-                        callback: lang.hitch(this, function() {
-                            console.debug("sent");
-                        })
-                    });
-                }
-            }));
+            } else {
+                this._contextObj.set(this.filterOutAttr, "");
+            }
         },
 
         _resetSubscriptions: function() {
