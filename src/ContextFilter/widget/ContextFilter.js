@@ -23,6 +23,9 @@ define([
         gridName: null,
         overrideStaticConstraint: null,
         filterAttr: null,
+        filterOutAttr: null,
+        microflow: null,
+
         // Internal variables.
         _handles: null,
         _contextObj: null,
@@ -45,9 +48,40 @@ define([
             logger.debug(this.id + ".update");
             this._contextObj = obj;
             var filterString = this._contextObj.get(this.filterAttr);
+            this._addActionButton();
             this._filterAndReloadGrid(filterString);
             this._resetSubscriptions();
             this._updateRendering(callback);
+        },
+
+        /**
+         * Add a new button to the datagrid that, when clicked, 
+         * updates a value on the context entity and then calls a microflow
+         */
+        _addActionButton: function() {
+            if (!this.filterOutAttr) return;
+            var button = document.createElement("button");
+            button.id = this.id + "_btn";
+            button.innerText = "Do Something";
+            button.className = "btn mx-button btn-default";
+            this._grid.toolBarNode.append(button);
+            this.connect(button, "click", lang.hitch(this, function() {
+                var gridSelection = this._grid._getXpathSelection();
+                this._contextObj.set(this.filterOutAttr, gridSelection.xpath + gridSelection.constraints);
+                if (this.microflow) {
+                    mx.data.action({
+                        params: {
+                            applyto: "selection",
+                            actionname: this.microflow,
+                            guids: [this._contextObj.getGuid()]
+                        },
+                        origin: this.mxform,
+                        callback: lang.hitch(this, function() {
+                            console.debug("sent");
+                        })
+                    });
+                }
+            }));
         },
 
         _resetSubscriptions: function() {

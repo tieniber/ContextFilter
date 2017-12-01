@@ -25,5 +25,20 @@
              <attributeType name="String" />
          </attributeTypes>
      </property>
+      <!-- filterOutAttr: null,        microflow: null, -->
+      <property key="filterOutAttr" type="attribute" required="false" isPath="optional" pathType="reference">
+          <caption>Selection Filter Attr</caption>
+          <category>Selection</category>
+          <description>The String attribute to which we will write the xpath filter for the selection of the grid.</description>
+          <attributeTypes>
+              <attributeType name="String" />
+          </attributeTypes>
+      </property>
+      <property key="microflow" type="microflow" required="false">
+          <caption>Selection Action</caption>
+          <category>Selection</category>
+          <description>The microflow to run when you click the Selection Action button</description>
+          <returnType type="Void"></returnType>
+      </property>
     </properties>
 </widget>
