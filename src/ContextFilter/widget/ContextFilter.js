@@ -77,17 +77,33 @@ define([
                 backup = datasource.getConstraints();
                 datasource.setConstraints(filterString); // add
             }
-            datasource.isValid(lang.hitch(this, function(ok) {
-                if (ok) { // this is always true
-                    if (this._grid.reload && "function" === typeof this._grid.reload) { // grid
-                        this._grid.reload();
-                    } else if (this._grid.update && "function" === typeof this._grid.update) {
-                        this._grid.update();
-                    } else {
-                        console.error("Could not find the reload/update method.");
+            // EXPERIMENTAL--OVERRIDE THE _RUNQUERY METHOD ON DATASOURE
+            datasource._runQuery = function(t) {
+                // n.debug(this.name + "._runQuery");
+                var e = this._xpathString();
+                e ? window.mx.data.get({
+                    xpath: this.getCurrentXPath(),
+                    filter: this.getFilterOptions(),
+                    count: !0,
+                    aggregates: this._aggregates,
+                    callback: function(e, n) {
+                        this._handleObjects(e, n.count, n.aggregates, t);
+                    },
+                    error: function(e) {
+                        // don't show the window error
+                        console.error("[ContextFilter Widget] >>>> Looks like the xpath failed. Tried to run the xpath: " + this._xpath + filterString);
                     }
-                }
-            }));
+                }, this) : this._handleObjects([], 0, null, t);
+            };
+            ////////////////////
+
+            if (this._grid.reload && "function" === typeof this._grid.reload) { // grid
+                this._grid.reload();
+            } else if (this._grid.update && "function" === typeof this._grid.update) {
+                this._grid.update();
+            } else {
+                console.error("Could not find the reload/update method.");
+            }
 
         },
 
