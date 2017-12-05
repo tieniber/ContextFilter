@@ -25,6 +25,7 @@ define([
         overrideStaticConstraint: null,
         filterAttr: null,
         filterOutAttr: null,
+        filterOutRefSet: null,
         // microflow: null,
 
         // Internal variables.
@@ -68,41 +69,19 @@ define([
             }));
         },
 
-        /**
-         * Add a new button to the datagrid that, when clicked, 
-         * updates a value on the context entity and then calls a microflow
-         */
-        // _addActionButton: function() {
-        //     if (!this.filterOutAttr) return;
-        //     var button = document.createElement("button");
-        //     button.id = this.id + "_btn";
-        //     button.innerText = "Do Something";
-        //     button.className = "btn mx-button btn-default";
-        //     this._grid.toolBarNode.append(button);
-        //     this.connect(button, "click", lang.hitch(this, function() {
-        //         this._setCurrentSelectionToContext();
-        //         if (this.microflow) {
-        //             mx.data.action({
-        //                 params: {
-        //                     applyto: "selection",
-        //                     actionname: this.microflow,
-        //                     guids: [this._contextObj.getGuid()]
-        //                 },
-        //                 origin: this.mxform,
-        //                 callback: lang.hitch(this, function() {
-        //                     console.debug("sent");
-        //                 })
-        //             });
-        //         }
-        //     }));
-        // },
-
         _setCurrentSelectionToContext: function() {
             var gridSelection = this._grid._getXpathSelection();
             if (gridSelection) {
-                this._contextObj.set(this.filterOutAttr, gridSelection.xpath + gridSelection.constraints);
+                if (this.filterOutAttr) {
+                    this._contextObj.set(this.filterOutAttr, gridSelection.xpath + gridSelection.constraints);
+                }
+                if (this.filterOutRefSet) {
+                    var refSetName = this.filterOutRefSet.split("/")[0];
+                    this._contextObj.set(refSetName, this._grid.selection);
+                }
             } else {
                 this._contextObj.set(this.filterOutAttr, "");
+                this._contextObj.set(this.filterOutRefSet, "");
             }
         },
 

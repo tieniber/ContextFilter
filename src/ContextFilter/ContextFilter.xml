@@ -1,38 +1,42 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<widget id="ContextFilter.widget.ContextFilter" needsEntityContext="true" xmlns="http://www.mendix.com/widget/1.0/">
+<widget id="ContextFilter.widget.ContextFilter" needsEntityContext="true" 
+    xmlns="http://www.mendix.com/widget/1.0/">
     <name>ContextFilter</name>
     <description>The description of this widget.</description>
-
     <icon />
-
     <properties>
-    <!--  gridName: null,        overrideStaticConstraint: null,        filterAttr: null, -->
-     <property key="gridName" type="string" required="true" defaultValue="">
-         <caption>Grid Name</caption>
-         <category>General</category>
-         <description>The name of the grid to attach to. Must be a sibling of this widget.</description>
-     </property>
-     <property key="overrideStaticConstraint" type="boolean" required="true" defaultValue="false">
-         <caption>Override Static?</caption>
-         <category>General</category>
-         <description>If Yes, will override any xpath filters set for the grid in the modeler. If no, behaves like search</description>
-     </property>
-     <property key="filterAttr" type="attribute" required="true" isPath="no">
-         <caption>Filter Attr</caption>
-         <category>General</category>
-         <description>The Attribute on the context object that contains the xpath filter</description>
-         <attributeTypes>
-             <attributeType name="String" />
-         </attributeTypes>
-     </property>
-      <!-- filterOutAttr: null,        microflow: null, -->
-      <property key="filterOutAttr" type="attribute" required="false" isPath="optional" pathType="reference">
-          <caption>Selection Filter Attr</caption>
-          <category>Selection</category>
-          <description>The String attribute to which we will write the xpath filter for the selection of the grid.</description>
-          <attributeTypes>
-              <attributeType name="String" />
-          </attributeTypes>
-      </property>
+        <!--  gridName: null,        overrideStaticConstraint: null,        filterAttr: null, -->
+        <property key="gridName" type="string" required="true" defaultValue="">
+            <caption>Grid Name</caption>
+            <category>General</category>
+            <description>The name of the grid to attach to. Must be a sibling of this widget.</description>
+        </property>
+        <property key="overrideStaticConstraint" type="boolean" required="true" defaultValue="false">
+            <caption>Override Static?</caption>
+            <category>General</category>
+            <description>If Yes, will override any xpath filters set for the grid in the modeler. If no, behaves like search</description>
+        </property>
+        <property key="filterAttr" type="attribute" required="true" isPath="no">
+            <caption>Filter Attr</caption>
+            <category>General</category>
+            <description>The Attribute on the context object that contains the xpath filter</description>
+            <attributeTypes>
+                <attributeType name="String" />
+            </attributeTypes>
+        </property>
+        <!-- filterOutAttr: null,        microflow: null, -->
+        <property key="filterOutAttr" type="attribute" required="false" isPath="optional" pathType="reference">
+            <caption>Selection Filter Attr</caption>
+            <category>Selection</category>
+            <description>The String attribute to which we will write the xpath filter for the selection of the grid.</description>
+            <attributeTypes>
+                <attributeType name="String" />
+            </attributeTypes>
+        </property>
+        <property key="filterOutRefSet" type="entity" isPath="yes" allowNonPersistableEntities="false" pathType="referenceSet" required="false">
+            <caption>Selection Ref Set</caption>
+            <category>Selection</category>
+            <description>The Reference Set on which to store the selection.</description>
+        </property>
     </properties>
 </widget>
