@@ -14,8 +14,9 @@ define([
     "dojo/text",
     "dojo/html",
     "dojo/_base/event",
+    "dojo/aspect"
 
-], function(declare, _WidgetBase, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, lang, dojoText, dojoHtml, dojoEvent) {
+], function(declare, _WidgetBase, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, lang, dojoText, dojoHtml, dojoEvent, Aspect) {
     "use strict";
 
     return declare("ContextFilter.widget.ContextFilter", [_WidgetBase], {
@@ -23,6 +24,10 @@ define([
         gridName: null,
         overrideStaticConstraint: null,
         filterAttr: null,
+        filterOutAttr: null,
+        filterOutRefSet: null,
+        // microflow: null,
+
         // Internal variables.
         _handles: null,
         _contextObj: null,
@@ -45,9 +50,39 @@ define([
             logger.debug(this.id + ".update");
             this._contextObj = obj;
             var filterString = this._contextObj.get(this.filterAttr);
+            // this._addActionButton();
+            this._attachGridSelectionListeners();
             this._filterAndReloadGrid(filterString);
             this._resetSubscriptions();
             this._updateRendering(callback);
+        },
+
+        /**
+         * every time the selection is updated, update the context object
+         */
+        _attachGridSelectionListeners: function() {
+            Aspect.after(this._grid, "_addToSelection", lang.hitch(this, function() {
+                this._setCurrentSelectionToContext();
+            }));
+            Aspect.after(this._grid, "_removeFromSelection", lang.hitch(this, function() {
+                this._setCurrentSelectionToContext();
+            }));
+        },
+
+        _setCurrentSelectionToContext: function() {
+            var gridSelection = this._grid._getXpathSelection();
+            if (gridSelection) {
+                if (this.filterOutAttr) {
+                    this._contextObj.set(this.filterOutAttr, gridSelection.xpath + gridSelection.constraints);
+                }
+                if (this.filterOutRefSet) {
+                    var refSetName = this.filterOutRefSet.split("/")[0];
+                    this._contextObj.set(refSetName, this._grid.selection);
+                }
+            } else {
+                this._contextObj.set(this.filterOutAttr, "");
+                this._contextObj.set(this.filterOutRefSet, "");
+            }
         },
 
         _resetSubscriptions: function() {
@@ -68,7 +103,7 @@ define([
         },
 
         _filterAndReloadGrid: function(filterString) {
-            var datasource = this._grid._dataSource,
+            var datasource = this._grid._dataSource || this._grid._datasource, // grid || listview
                 backup = null;
             if (this.overrideStaticConstraint) {
                 backup = datasource._staticconstraint;
@@ -77,11 +112,33 @@ define([
                 backup = datasource.getConstraints();
                 datasource.setConstraints(filterString); // add
             }
-            datasource.isValid(lang.hitch(this, function(ok) {
-                if (ok) { // this is always true
-                    this._grid.reload();
-                }
-            }));
+            // EXPERIMENTAL--OVERRIDE THE _RUNQUERY METHOD ON DATASOURE
+            datasource._runQuery = function(t) {
+                // n.debug(this.name + "._runQuery");
+                var e = this._xpathString();
+                e ? window.mx.data.get({
+                    xpath: this.getCurrentXPath(),
+                    filter: this.getFilterOptions(),
+                    count: !0,
+                    aggregates: this._aggregates,
+                    callback: function(e, n) {
+                        this._handleObjects(e, n.count, n.aggregates, t);
+                    },
+                    error: function(e) {
+                        // don't show the window error
+                        console.error("[ContextFilter Widget] >>>> Looks like the xpath failed. Tried to run the xpath: " + this._xpath + filterString);
+                    }
+                }, this) : this._handleObjects([], 0, null, t);
+            };
+            ////////////////////
+
+            if (this._grid.reload && "function" === typeof this._grid.reload) { // grid
+                this._grid.reload();
+            } else if (this._grid.update && "function" === typeof this._grid.update) {
+                this._grid.update();
+            } else {
+                console.error("Could not find the reload/update method.");
+            }
 
         },
 
