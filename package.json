@@ -1,12 +1,11 @@
 {
   "name": "ContextFilter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Apply an Xpath string from the context object as a filter on a datagrid",
   "license": "MIT",
   "author": "Conner Charlebois",
   "private": true,
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "del": "^2.2.2",
     "gulp": "^3.9.1",

@@ -16,7 +16,7 @@
             <category>General</category>
             <description>If Yes, will override any xpath filters set for the grid in the modeler. If no, behaves like search</description>
         </property>
-        <property key="filterAttr" type="attribute" required="true" isPath="no">
+        <property key="filterAttr" type="attribute" required="false" isPath="no">
             <caption>Filter Attr</caption>
             <category>General</category>
             <description>The Attribute on the context object that contains the xpath filter</description>

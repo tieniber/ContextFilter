@@ -67,6 +67,12 @@ define([
             Aspect.after(this._grid, "_removeFromSelection", lang.hitch(this, function() {
                 this._setCurrentSelectionToContext();
             }));
+            Aspect.after(this._grid, "actionSelectAllPages", lang.hitch(this, function() {
+                this._setCurrentSelectionToContext();
+            }));
+            Aspect.after(this._grid, "actionSelectPage", lang.hitch(this, function() {
+                this._setCurrentSelectionToContext();
+            }));
         },
 
         _setCurrentSelectionToContext: function() {
@@ -77,7 +83,21 @@ define([
                 }
                 if (this.filterOutRefSet) {
                     var refSetName = this.filterOutRefSet.split("/")[0];
-                    this._contextObj.set(refSetName, this._grid.selection);
+                    if (this._grid._gridState.invertedSelection) {
+                        // we need to query the db to get the ids...
+                        mx.data.get({
+                            xpath: gridSelection.xpath + gridSelection.constraints,
+                            callback: lang.hitch(this, function(result) {
+                                console.log(result);
+                                this._contextObj.set(refSetName, result.map(function(r) { return r.getGuid(); }));
+                            }),
+                            error: function(err) {
+                                console.error(err);
+                            }
+                        });
+                    } else {
+                        this._contextObj.set(refSetName, this._grid.selection);
+                    }
                 }
             } else {
                 this._contextObj.set(this.filterOutAttr, "");
