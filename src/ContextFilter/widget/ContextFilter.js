@@ -52,6 +52,8 @@ define([
             var filterString = this._contextObj.get(this.filterAttr);
             // this._addActionButton();
             this._attachGridSelectionListeners();
+            this._attachGridLoadListeners();
+            this._grid.unsubscribeAll();
             this._filterAndReloadGrid(filterString);
             this._resetSubscriptions();
             this._updateRendering(callback);
@@ -69,20 +71,58 @@ define([
             }));
         },
 
+        _attachGridLoadListeners: function() {
+            if (this.resultsAttr && this.resultsIDAttr) {
+                Aspect.after(this._grid, "refreshGrid", lang.hitch(this, function() {
+                    this._setCurrentGridObjectsToContext();
+                }));
+            }
+        },
+
         _setCurrentSelectionToContext: function() {
-            var gridSelection = this._grid._getXpathSelection();
-            if (gridSelection) {
+            if (this._grid.selection.length > 0) {
                 if (this.filterOutAttr) {
-                    this._contextObj.set(this.filterOutAttr, gridSelection.xpath + gridSelection.constraints);
+                    var gridSelectionX = this._grid._getXpathSelection();
+                    this._contextObj.set(this.filterOutAttr, gridSelectionX.xpath + gridSelectionX.constraints);
                 }
                 if (this.filterOutRefSet) {
                     var refSetName = this.filterOutRefSet.split("/")[0];
                     this._contextObj.set(refSetName, this._grid.selection);
                 }
+                if (this.filterOutRef) {
+                    var refName = this.filterOutRef.split("/")[0];
+                    this._contextObj.set(refName, this._grid.selection[0]);
+                }
+
+                if (this.filterOutIDAttr && this.listIDAttr) {
+
+                    var selectedID = this._grid.selection[0];
+                    var selectedObj = this._getMxObj(this._grid, selectedID);
+                    var selectedIdVal = selectedObj.get(this.listIDAttr);
+                    this._contextObj.set(this.filterOutIDAttr, selectedIdVal);
+                }
             } else {
                 this._contextObj.set(this.filterOutAttr, "");
                 this._contextObj.set(this.filterOutRefSet, "");
             }
+        },
+
+        _setCurrentGridObjectsToContext: function() {
+            var ids = []
+            var mxObjs = this._grid._mxObjects;
+            for (var i=0; i<mxObjs.length; i++) {
+                var curObj = mxObjs[i];
+                var curId = curObj.get(this.resultsIDAttr);
+                ids.push(curId);
+            }
+            var outString = ids.join(",");
+            this._contextObj.set(this.resultsAttr, outString);
+        },
+
+        //gets an mxObj from the grid based on a guid
+        _getMxObj: function(grid, guid) {
+            for(var t=grid._mxObjects,n=0;n<t.length;++n)if(t[n].getGuid()===guid)
+            return t[n];
         },
 
         _resetSubscriptions: function() {

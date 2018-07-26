@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<widget id="ContextFilter.widget.ContextFilter" needsEntityContext="true" 
+<widget id="ContextFilter.widget.ContextFilter" needsEntityContext="true"
     xmlns="http://www.mendix.com/widget/1.0/">
     <name>ContextFilter</name>
     <description>The description of this widget.</description>
@@ -27,7 +27,7 @@
         <!-- filterOutAttr: null,        microflow: null, -->
         <property key="filterOutAttr" type="attribute" required="false" isPath="optional" pathType="reference">
             <caption>Selection Filter Attr</caption>
-            <category>Selection</category>
+            <category>Multi-Selection</category>
             <description>The String attribute to which we will write the xpath filter for the selection of the grid.</description>
             <attributeTypes>
                 <attributeType name="String" />
@@ -35,8 +35,56 @@
         </property>
         <property key="filterOutRefSet" type="entity" isPath="yes" allowNonPersistableEntities="false" pathType="referenceSet" required="false">
             <caption>Selection Ref Set</caption>
-            <category>Selection</category>
+            <category>Multi-Selection</category>
             <description>The Reference Set on which to store the selection.</description>
+        </property>
+        <property key="listEntity" type="entity" allowNonPersistableEntities="true" required="true">
+            <caption>List Entity</caption>
+            <category>General</category>
+            <description>The type of entity in the list.</description>
+        </property>
+        <property key="listIDAttr"  entityProperty="listEntity" type="attribute" required="false">
+            <caption>Attribute source</caption>
+            <category>Single Selection</category>
+            <description>The attribute to pull from the selected row.</description>
+            <attributeTypes>
+                <attributeType name="String" />
+                <attributeType name="Integer" />
+                 <attributeType name="AutoNumber" />
+            </attributeTypes>
+        </property>
+        <property key="filterOutIDAttr" type="attribute" required="false">
+            <caption>Attribute destination</caption>
+            <category>Single Selection</category>
+            <description>The attribute on the context entity where we'll store the selected row's attribute</description>
+            <attributeTypes>
+                <attributeType name="String" />
+                <attributeType name="Integer" />
+                <attributeType name="AutoNumber" />
+            </attributeTypes>
+        </property>
+        <property key="filterOutRef" type="entity" isPath="yes" allowNonPersistableEntities="true" pathType="reference" required="false">
+            <caption>Selection Ref</caption>
+            <category>Single Selection</category>
+            <description>The Reference on which to store the single selection.</description>
+        </property>
+        <property key="resultsIDAttr"  entityProperty="listEntity" type="attribute" required="false">
+            <caption>Results attribute source</caption>
+            <category>List Results</category>
+            <description>The attribute to pull from the rows to be used in the Results attribute below.</description>
+            <attributeTypes>
+                <attributeType name="String" />
+                <attributeType name="Integer" />
+                 <attributeType name="AutoNumber" />                   
+            </attributeTypes>
+        </property>
+        <property key="resultsAttr" type="attribute" required="false" isPath="no">
+            <caption>Results Attribute</caption>
+            <category>List Results</category>
+            <description>The Attribute on the context object that should get a comma-separated list of the items in the grid. The id given will be an attribute of the grid items.</description>
+            <attributeTypes>
+                <attributeType name="String" />
+            </attributeTypes>
         </property>
     </properties>
 </widget>
